@@ -178,7 +178,13 @@ private:
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
-    
+       template<typename T>
+    T ReadMemory(uintptr_t address) {
+        T value;
+        ReadProcessMemory(processHandle, (LPCVOID)address, &value, sizeof(T), nullptr);
+        return value;
+    }
+
     void TargetingWorker() {
         // implement target selection
         while(running) {
@@ -186,21 +192,9 @@ private:
             
             // scan for valid targets
             for(int i = 0; i < MAX_TARGETS; i++) {
-                Vector3 pos;
-                float health;
-                int team;
-                
-                ReadProcessMemory(processHandle,
-                    (LPCVOID)(PLAYER_BASE + TARGET_OFFSET + i * sizeof(Vector3)),
-                    &pos, sizeof(pos), nullptr);
-                    
-                ReadProcessMemory(processHandle,
-                    (LPCVOID)(PLAYER_BASE + HEALTH_OFFSET + i * sizeof(float)),
-                    &health, sizeof(health), nullptr);
-                    
-                ReadProcessMemory(processHandle,
-                    (LPCVOID)(PLAYER_BASE + TEAM_OFFSET + i * sizeof(int)),
-                    &team, sizeof(team), nullptr);
+                Vector3 pos = ReadMemory<Vector3>(PLAYER_BASE + TARGET_OFFSET + i * sizeof(Vector3));
+                float health = ReadMemory<float>(PLAYER_BASE + HEALTH_OFFSET + i * sizeof(float));
+                int team = ReadMemory<int>(PLAYER_BASE + TEAM_OFFSET + i * sizeof(int));
                     
                 if(health > 0) {
                     TargetInfo& target = targetCache[i];

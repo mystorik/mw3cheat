@@ -328,6 +328,7 @@ enum enum_server_command
   transaction status at the end of command execution.
 */
 #define SERVER_STATUS_IN_TRANS_READONLY 8192
+#define SERVER_STATUS_IN_TRANS_READONLY2 16384 // needs to be defined for ac now - mystorik					  
 
 
 /**
